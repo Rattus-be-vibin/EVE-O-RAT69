@@ -12,7 +12,7 @@ namespace EveOPreview.Presenters;
 
 public class MainFormPresenter : Presenter<IMainFormView>, IMainFormPresenter
 {
-	private const string FORUM_URL = "https://forum.eveonline.com/t/4202";
+	private const string FORUM_URL = "https://github.com/Rattus-be-vibin/EVE-O-RAT69";
 
 	private readonly IMediator _mediator;
 
@@ -49,7 +49,7 @@ public class MainFormPresenter : Presenter<IMainFormView>, IMainFormPresenter
 	{
 		_suppressSizeNotifications = true;
 		LoadApplicationSettings();
-		View.SetDocumentationUrl("https://forum.eveonline.com/t/4202");
+		View.SetDocumentationUrl("github.com/Rattus-be-vibin/EVE-O-RAT69");
 		View.SetVersionInfo(GetApplicationVersion());
 		if (_configuration.MinimizeToTray)
 		{
@@ -196,7 +196,7 @@ public class MainFormPresenter : Presenter<IMainFormView>, IMainFormPresenter
 
 	private void OpenDocumentationLink()
 	{
-		ProcessStartInfo startInfo = new ProcessStartInfo(new Uri("https://forum.eveonline.com/t/4202").AbsoluteUri);
+		ProcessStartInfo startInfo = new ProcessStartInfo(new Uri(FORUM_URL).AbsoluteUri);
 		Process.Start(startInfo);
 	}
 

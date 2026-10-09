@@ -26,6 +26,22 @@ jobs:
           Copy-Item "build/EVE-O Preview.exe", "template/EVE-O Preview.json", "template/README.md" pkg/
           Compress-Archive -Path pkg/* -DestinationPath "build/EVE-O-Preview-share.zip" -Force
           "BUILD OK $(Get-Date -Format o)" | Add-Content ci/build.log
+      - name: Measure About-tab text widths
+        shell: powershell
+        continue-on-error: true
+        run: |
+          Add-Type -AssemblyName System.Windows.Forms, System.Drawing
+          $bold = New-Object System.Drawing.Font("Microsoft Sans Serif", 9, [System.Drawing.FontStyle]::Bold)
+          $norm = New-Object System.Drawing.Font("Microsoft Sans Serif", 8.25)
+          $items = @(
+            @($bold, "EVE-O Preview - Rattus Edition v1.1", 4),
+            @($norm, "Credit to previous maintainer: Phrynohyas Tig-Rah", 16),
+            @($norm, "For suggestions, contact #therattus on Discord", 16),
+            @($norm, "Source code and updates:", 16),
+            @($norm, "github.com/Rattus-be-vibin/EVE-O-RAT69", 16))
+          $out = foreach ($i in $items) { $w = [System.Windows.Forms.TextRenderer]::MeasureText($i[1], $i[0]).Width; "{0,4}px (+{1} pad = {2}) / panel 260 : {3}" -f $w, $i[2], ($w + $i[2]), $i[1] }
+          $out | Out-File ci/text-widths.txt
+          $out
       - uses: actions/upload-artifact@v4
         if: steps.build.outcome == 'success'
         with:

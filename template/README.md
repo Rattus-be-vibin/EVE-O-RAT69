@@ -1,4 +1,4 @@
-# EVE-O Preview: setup
+# EVE-O Preview - Rattus Edition v1.1: setup
 
 This is a modified build of EVE-O Preview 6.0.0.3. The client-switching hotkeys
 only work while an EVE client is the active window, so keys like Tab behave
