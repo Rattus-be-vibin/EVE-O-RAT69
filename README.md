@@ -15,7 +15,7 @@ Setup instructions: [template/README.md](template/README.md)
 ## Changes from the original
 
 - **Hotkeys only work while an EVE client is the active window.** Keys like Tab behave normally in other apps. Set `"HotkeysOnlyWhenClientActive": false` to restore the old behaviour.
-- **Character-select cycling.** `CharSelectCycleForwardHotkeys` / `CharSelectCycleBackwardHotkeys` cycle through clients at character select (window title `EVE`), in launch order. Off by default.
+- **Character-select cycling.** `CharSelectCycleForwardHotkeys` / `CharSelectCycleBackwardHotkeys` cycle through clients at character select (window title `EVE`), in launch order. Off by default. You will need to bind hotkeys for this function in the JSON file.
 - **Default config written on first launch** if no `EVE-O Preview.json` exists.
 - **Fixed default hotkey:** group 1 backward was Ctrl+Enter, now Ctrl+F13.
 
