@@ -1,0 +1,60 @@
+name: Decompile original exe
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['original/**', '.github/workflows/decompile.yml']
+permissions:
+  contents: write
+jobs:
+  decompile:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Extract Costura-embedded libraries
+        shell: powershell
+        run: |
+          New-Item -ItemType Directory -Force work, lib | Out-Null
+          Copy-Item "original/EVE-O Preview.exe" "work/EVE-O Preview.exe"
+          $asm = [Reflection.Assembly]::LoadFile((Resolve-Path "work/EVE-O Preview.exe").Path)
+          $asm.GetManifestResourceNames() | Out-File lib/resource-names.txt
+          foreach ($r in $asm.GetManifestResourceNames()) {
+            if ($r -like 'costura.*.compressed') {
+              $name = $r -replace '^costura\.','' -replace '\.compressed$',''
+              $s = $asm.GetManifestResourceStream($r)
+              $ds = New-Object IO.Compression.DeflateStream($s, [IO.Compression.CompressionMode]::Decompress)
+              $out = [IO.File]::Create((Join-Path (Resolve-Path lib).Path $name))
+              $ds.CopyTo($out); $out.Close(); $ds.Close()
+              Copy-Item (Join-Path lib $name) (Join-Path work $name)
+            }
+          }
+          Get-ChildItem lib | Format-Table Name, Length | Out-String | Write-Host
+      - name: Decompile with ILSpy
+        shell: pwsh
+        run: |
+          dotnet tool install -g ilspycmd
+          Remove-Item -Recurse -Force src -ErrorAction SilentlyContinue
+          ilspycmd -p -o src "work/EVE-O Preview.exe" 2>&1 | Tee-Object decompile.log
+          Get-ChildItem -Recurse lib | ForEach-Object { [Reflection.AssemblyName]::GetAssemblyName($_.FullName).FullName } 2>$null | Out-File lib/versions.txt
+      - name: Trial build
+        shell: pwsh
+        continue-on-error: true
+        run: |
+          New-Item -ItemType Directory -Force ci | Out-Null
+          $proj = Get-ChildItem src -Filter *.csproj | Select-Object -First 1
+          dotnet build $proj.FullName -c Release 2>&1 | Out-File ci/trial-build.log
+          Get-Content ci/trial-build.log -Tail 40
+      - name: Commit results
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force ci | Out-Null
+          Move-Item decompile.log ci/decompile.log -Force
+          Get-ChildItem -Recurse src -Include bin,obj -Directory | Remove-Item -Recurse -Force
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          git add src lib ci
+          git commit -m "Decompiled source from original exe [skip ci]"
+          git push
