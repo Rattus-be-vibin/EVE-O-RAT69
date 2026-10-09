@@ -172,7 +172,7 @@ internal sealed class ThumbnailConfiguration : IThumbnailConfiguration
 	{
 		ConfigVersion = 1;
 		CycleGroup1ForwardHotkeys = new List<string> { "F13" };
-		CycleGroup1BackwardHotkeys = new List<string> { "Control+13" };
+		CycleGroup1BackwardHotkeys = new List<string> { "Control+F13" };
 		CycleGroup1ClientsOrder = new Dictionary<string, int>
 		{
 			{ "EVE - Example DPS Toon 1", 1 },
