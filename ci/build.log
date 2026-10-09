@@ -1,0 +1,5 @@
+
+  Determining projects to restore...
+  Restored D:\a\EVE-O-RAT69\EVE-O-RAT69\src\EVE-O Preview.csproj (in 21.56 sec).
+MSBUILD : error : Fody: Failed to update schema for (D:\a\EVE-O-RAT69\EVE-O-RAT69\src\FodyWeavers.xml). Exception message: Duplicate attribute. [D:\a\EVE-O-RAT69\EVE-O-RAT69\src\EVE-O Preview.csproj]
+BUILD FAILED
