@@ -1,6 +1,6 @@
 # EVE-O Preview - Rattus Edition v1.1
 
-A modified build of EVE-O Preview 6.0.0.3 (Rattus Edition v1.1), decompiled and rebuilt from the original fork.
+A modified build of EVE-O Preview 6.0.3 (Rattus Edition v1.1), decompiled and rebuilt from the original fork.
 
 ## Download
 
