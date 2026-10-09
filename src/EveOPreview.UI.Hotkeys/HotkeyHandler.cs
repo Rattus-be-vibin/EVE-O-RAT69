@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows.Forms;
 
@@ -13,6 +14,41 @@ internal class HotkeyHandler : IMessageFilter, IDisposable
 	private readonly int _hotkeyId;
 
 	private readonly IntPtr _hotkeyTarget;
+
+	// Global on/off switch for all hotkeys. While off, hotkeys stay "wanted" but are
+	// released at the OS level so the keys reach whatever app is in the foreground.
+	private static readonly HashSet<HotkeyHandler> _wanted = new HashSet<HotkeyHandler>();
+
+	private static bool _hotkeysActive = true;
+
+	private bool _isWanted;
+
+	public static bool HotkeysActive
+	{
+		get
+		{
+			return _hotkeysActive;
+		}
+		set
+		{
+			if (_hotkeysActive == value)
+			{
+				return;
+			}
+			_hotkeysActive = value;
+			foreach (HotkeyHandler handler in new List<HotkeyHandler>(_wanted))
+			{
+				if (value)
+				{
+					handler.RegisterNative();
+				}
+				else
+				{
+					handler.UnregisterNative();
+				}
+			}
+		}
+	}
 
 	public bool IsRegistered { get; private set; }
 
@@ -37,14 +73,18 @@ internal class HotkeyHandler : IMessageFilter, IDisposable
 
 	~HotkeyHandler()
 	{
-		Unregister();
+		UnregisterNative();
 	}
 
 	public bool CanRegister()
 	{
-		if (Register())
+		if (IsRegistered)
 		{
-			Unregister();
+			return true;
+		}
+		if (RegisterNative())
+		{
+			UnregisterNative();
 			return true;
 		}
 		return false;
@@ -52,9 +92,37 @@ internal class HotkeyHandler : IMessageFilter, IDisposable
 
 	public bool Register()
 	{
-		if (IsRegistered)
+		if (_isWanted || KeyCode == Keys.None)
 		{
 			return false;
+		}
+		if (!_hotkeysActive)
+		{
+			_isWanted = true;
+			_wanted.Add(this);
+			return true;
+		}
+		if (!RegisterNative())
+		{
+			return false;
+		}
+		_isWanted = true;
+		_wanted.Add(this);
+		return true;
+	}
+
+	public void Unregister()
+	{
+		_isWanted = false;
+		_wanted.Remove(this);
+		UnregisterNative();
+	}
+
+	private bool RegisterNative()
+	{
+		if (IsRegistered)
+		{
+			return true;
 		}
 		if (KeyCode == Keys.None)
 		{
@@ -71,7 +139,7 @@ internal class HotkeyHandler : IMessageFilter, IDisposable
 		return true;
 	}
 
-	public void Unregister()
+	private void UnregisterNative()
 	{
 		if (IsRegistered)
 		{

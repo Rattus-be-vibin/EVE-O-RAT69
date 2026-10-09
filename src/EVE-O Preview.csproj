@@ -5,42 +5,29 @@
     <OutputType>WinExe</OutputType>
     <UseWindowsForms>True</UseWindowsForms>
     <TargetFramework>net48</TargetFramework>
-  </PropertyGroup>
-  <PropertyGroup>
-    <LangVersion>14.0</LangVersion>
+    <LangVersion>latest</LangVersion>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
-  </PropertyGroup>
-  <PropertyGroup>
     <ApplicationIcon>app.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <RootNamespace />
+    <Nullable>disable</Nullable>
+    <DebugType>none</DebugType>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="EveOPreview.app.manifest" />
-    <None Remove="costura.costura.dll.compressed" />
-    <None Remove="costura.lightinject.dll.compressed" />
-    <None Remove="costura.mediatr.dll.compressed" />
-    <None Remove="costura.newtonsoft.json.dll.compressed" />
-    <None Remove="costura.system.valuetuple.dll.compressed" />
     <EmbeddedResource Include="EveOPreview.app.manifest" LogicalName="EveOPreview.app.manifest" />
-    <EmbeddedResource Include="costura.costura.dll.compressed" LogicalName="costura.costura.dll.compressed" />
-    <EmbeddedResource Include="costura.lightinject.dll.compressed" LogicalName="costura.lightinject.dll.compressed" />
-    <EmbeddedResource Include="costura.mediatr.dll.compressed" LogicalName="costura.mediatr.dll.compressed" />
-    <EmbeddedResource Include="costura.newtonsoft.json.dll.compressed" LogicalName="costura.newtonsoft.json.dll.compressed" />
-    <EmbeddedResource Include="costura.system.valuetuple.dll.compressed" LogicalName="costura.system.valuetuple.dll.compressed" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System.Core" />
-    <Reference Include="LightInject">
-      <HintPath>work/LightInject.dll</HintPath>
-    </Reference>
-    <Reference Include="MediatR">
-      <HintPath>work/MediatR.dll</HintPath>
-    </Reference>
     <Reference Include="WindowsBase" />
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>work/Newtonsoft.Json.dll</HintPath>
-    </Reference>
+    <Reference Include="LightInject"><HintPath>..\lib\lightinject.dll</HintPath></Reference>
+    <Reference Include="MediatR"><HintPath>..\lib\mediatr.dll</HintPath></Reference>
+    <Reference Include="Newtonsoft.Json"><HintPath>..\lib\newtonsoft.json.dll</HintPath></Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Re-embed the libraries into a single exe, like the original build -->
+    <PackageReference Include="Fody" Version="6.8.2" PrivateAssets="all" />
+    <PackageReference Include="Costura.Fody" Version="5.7.0" PrivateAssets="all" />
   </ItemGroup>
 </Project>

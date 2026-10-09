@@ -58,6 +58,8 @@ public interface IThumbnailConfiguration
 
 	bool HideThumbnailsOnLostFocus { get; set; }
 
+	bool HotkeysOnlyWhenClientActive { get; set; }
+
 	int HideThumbnailsDelay { get; set; }
 
 	Size ThumbnailSize { get; set; }

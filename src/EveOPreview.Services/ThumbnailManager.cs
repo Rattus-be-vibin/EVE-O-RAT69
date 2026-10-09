@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Threading;
@@ -59,6 +61,30 @@ internal sealed class ThumbnailManager : IThumbnailManager
 	private int _hideThumbnailsDelay;
 
 	private List<HotkeyHandler> _cycleClientHotkeyHandlers = new List<HotkeyHandler>();
+
+	// --- Hotkeys only while an EVE client is in the foreground ---
+	private delegate void WinEventDelegate(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime);
+
+	[DllImport("user32.dll")]
+	private static extern IntPtr SetWinEventHook(uint eventMin, uint eventMax, IntPtr hmodWinEventProc, WinEventDelegate lpfnWinEventProc, uint idProcess, uint idThread, uint dwFlags);
+
+	[DllImport("user32.dll")]
+	private static extern bool UnhookWinEvent(IntPtr hWinEventHook);
+
+	[DllImport("user32.dll")]
+	private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint processId);
+
+	private const uint EVENT_SYSTEM_FOREGROUND = 3u;
+
+	private const uint WINEVENT_OUTOFCONTEXT = 0u;
+
+	private WinEventDelegate _foregroundHookDelegate;
+
+	private IntPtr _foregroundHook = IntPtr.Zero;
+
+	private IntPtr _lastGateWindow = IntPtr.Zero;
+
+	private bool _lastGateResult;
 
 	public ThumbnailManager(IMediator mediator, IThumbnailConfiguration configuration, IProcessMonitor processMonitor, IWindowManager windowManager, IThumbnailViewFactory factory)
 	{
@@ -167,19 +193,90 @@ internal sealed class ThumbnailManager : IThumbnailManager
 	public void Start()
 	{
 		_thumbnailUpdateTimer.Start();
+		_thumbnailUpdateTimer.Dispatcher.Invoke(InstallForegroundHook);
 		RefreshThumbnails();
 	}
 
 	public void Stop()
 	{
 		_thumbnailUpdateTimer.Stop();
+		_thumbnailUpdateTimer.Dispatcher.Invoke(RemoveForegroundHook);
+		HotkeyHandler.HotkeysActive = true;
 	}
 
 	private void ThumbnailUpdateTimerTick(object sender, EventArgs e)
 	{
 		UpdateThumbnailsList();
+		UpdateHotkeyGate(_windowManager.GetForegroundWindowHandle());
 		RefreshThumbnails();
 	}
+
+	private void InstallForegroundHook()
+	{
+		if (_foregroundHook == IntPtr.Zero)
+		{
+			// Keep a reference to the delegate so the GC doesn't collect it while Windows holds it.
+			_foregroundHookDelegate = ForegroundChanged;
+			_foregroundHook = SetWinEventHook(EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND, IntPtr.Zero, _foregroundHookDelegate, 0u, 0u, WINEVENT_OUTOFCONTEXT);
+		}
+		UpdateHotkeyGate(_windowManager.GetForegroundWindowHandle());
+	}
+
+	private void RemoveForegroundHook()
+	{
+		if (_foregroundHook != IntPtr.Zero)
+		{
+			UnhookWinEvent(_foregroundHook);
+			_foregroundHook = IntPtr.Zero;
+		}
+	}
+
+	private void ForegroundChanged(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime)
+	{
+		UpdateHotkeyGate(hwnd);
+	}
+
+	private void UpdateHotkeyGate(IntPtr foregroundWindow)
+	{
+		if (!_configuration.HotkeysOnlyWhenClientActive)
+		{
+			HotkeyHandler.HotkeysActive = true;
+			return;
+		}
+		if (foregroundWindow == IntPtr.Zero)
+		{
+			// Transitional state while windows swap; keep the current setting.
+			return;
+		}
+		if (foregroundWindow != _lastGateWindow)
+		{
+			_lastGateWindow = foregroundWindow;
+			_lastGateResult = IsClientWindowActive(foregroundWindow) || IsEveProcessWindow(foregroundWindow);
+		}
+		HotkeyHandler.HotkeysActive = _lastGateResult;
+	}
+
+	private static bool IsEveProcessWindow(IntPtr windowHandle)
+	{
+		try
+		{
+			GetWindowThreadProcessId(windowHandle, out var processId);
+			if (processId == 0)
+			{
+				return false;
+			}
+			using (Process process = Process.GetProcessById((int)processId))
+			{
+				return string.Equals(process.ProcessName, DEFAULT_PROCESS_NAME_EVE, StringComparison.OrdinalIgnoreCase);
+			}
+		}
+		catch
+		{
+			return false;
+		}
+	}
+
+	private const string DEFAULT_PROCESS_NAME_EVE = "ExeFile";
 
 	private async void UpdateThumbnailsList()
 	{

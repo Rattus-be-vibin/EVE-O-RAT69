@@ -112,6 +112,8 @@ internal sealed class ThumbnailConfiguration : IThumbnailConfiguration
 
 	public bool HideThumbnailsOnLostFocus { get; set; }
 
+	public bool HotkeysOnlyWhenClientActive { get; set; }
+
 	public int HideThumbnailsDelay { get; set; }
 
 	public Size ThumbnailSize { get; set; }
@@ -225,6 +227,7 @@ internal sealed class ThumbnailConfiguration : IThumbnailConfiguration
 		ShowThumbnailsAlwaysOnTop = true;
 		EnablePerClientThumbnailLayouts = false;
 		HideThumbnailsOnLostFocus = false;
+		HotkeysOnlyWhenClientActive = true;
 		HideThumbnailsDelay = 2;
 		ThumbnailSize = new Size(384, 216);
 		ThumbnailMinimumSize = new Size(192, 108);
