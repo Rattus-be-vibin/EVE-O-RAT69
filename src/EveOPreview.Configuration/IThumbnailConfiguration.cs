@@ -36,6 +36,10 @@ public interface IThumbnailConfiguration
 
 	Dictionary<string, int> CycleGroup5ClientsOrder { get; set; }
 
+	List<string> CharSelectCycleForwardHotkeys { get; set; }
+
+	List<string> CharSelectCycleBackwardHotkeys { get; set; }
+
 	Dictionary<string, Color> PerClientActiveClientHighlightColor { get; set; }
 
 	bool MinimizeToTray { get; set; }

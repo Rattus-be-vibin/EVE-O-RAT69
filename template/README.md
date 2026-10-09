@@ -49,6 +49,19 @@ You can add or remove lines, and a group can be left with placeholder names if y
 don't use it. Key names follow Windows Forms naming: `A`–`Z`, `F1`–`F24`,
 `D1` (number 1), `Oemtilde` (~), and modifiers `Shift+`, `Control+`, `Alt+`.
 
+### Character-select cycling (optional)
+
+These hotkeys cycle only through clients that are still at the character
+selection screen (window title exactly `EVE`), in the order you launched them.
+They're empty (off) by default. To bind them:
+
+```json
+"CharSelectCycleForwardHotkeys": [ "Control+Tab" ],
+"CharSelectCycleBackwardHotkeys": [ "Control+Shift+Tab" ],
+```
+
+Pick keys that don't clash with your other hotkeys or with EVE's own shortcuts.
+
 ### Other per-character settings (optional)
 
 - `DisableThumbnail`: set a character to `true` to hide its preview thumbnail.

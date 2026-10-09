@@ -59,6 +59,12 @@ internal sealed class ThumbnailConfiguration : IThumbnailConfiguration
 	[JsonProperty("CycleGroup5ClientsOrder")]
 	public Dictionary<string, int> CycleGroup5ClientsOrder { get; set; }
 
+	[JsonProperty("CharSelectCycleForwardHotkeys")]
+	public List<string> CharSelectCycleForwardHotkeys { get; set; }
+
+	[JsonProperty("CharSelectCycleBackwardHotkeys")]
+	public List<string> CharSelectCycleBackwardHotkeys { get; set; }
+
 	[JsonProperty("PerClientActiveClientHighlightColor")]
 	public Dictionary<string, Color> PerClientActiveClientHighlightColor { get; set; }
 
@@ -193,6 +199,8 @@ internal sealed class ThumbnailConfiguration : IThumbnailConfiguration
 			{ "EVE - Example Scout Toon 1", 1 },
 			{ "EVE - Example Scout Toon 2", 2 }
 		};
+		CharSelectCycleForwardHotkeys = new List<string>();
+		CharSelectCycleBackwardHotkeys = new List<string>();
 		CycleGroup5ForwardHotkeys = new List<string> { "F17" };
 		CycleGroup5BackwardHotkeys = new List<string> { "Control+F17" };
 		CycleGroup5ClientsOrder = new Dictionary<string, int>

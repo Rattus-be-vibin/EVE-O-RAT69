@@ -114,6 +114,56 @@ internal sealed class ThumbnailManager : IThumbnailManager
 		RegisterCycleClientHotkey(_configuration.CycleGroup4BackwardHotkeys?.Select((string x) => _configuration.StringToKey(x)), isForwards: false, _configuration.CycleGroup4ClientsOrder);
 		RegisterCycleClientHotkey(_configuration.CycleGroup5ForwardHotkeys?.Select((string x) => _configuration.StringToKey(x)), isForwards: true, _configuration.CycleGroup5ClientsOrder);
 		RegisterCycleClientHotkey(_configuration.CycleGroup5BackwardHotkeys?.Select((string x) => _configuration.StringToKey(x)), isForwards: false, _configuration.CycleGroup5ClientsOrder);
+		RegisterCharSelectCycleHotkey(_configuration.CharSelectCycleForwardHotkeys, isForwards: true);
+		RegisterCharSelectCycleHotkey(_configuration.CharSelectCycleBackwardHotkeys, isForwards: false);
+	}
+
+	// --- Cycle through clients sitting at character select (window title is exactly "EVE") ---
+	private readonly Dictionary<IntPtr, long> _clientFirstSeen = new Dictionary<IntPtr, long>();
+
+	private long _clientSeenCounter;
+
+	private void RegisterCharSelectCycleHotkey(List<string> hotkeys, bool isForwards)
+	{
+		if (hotkeys == null)
+		{
+			return;
+		}
+		foreach (string hotkey in hotkeys)
+		{
+			Keys key = _configuration.StringToKey(hotkey);
+			if (key == Keys.None)
+			{
+				continue;
+			}
+			HotkeyHandler hotkeyHandler = new HotkeyHandler((IntPtr)0, key);
+			hotkeyHandler.Pressed += (object s, HandledEventArgs e) =>
+			{
+				CycleCharSelectClient(isForwards);
+				e.Handled = true;
+			};
+			hotkeyHandler.Register();
+			_cycleClientHotkeyHandlers.Add(hotkeyHandler);
+		}
+	}
+
+	public void CycleCharSelectClient(bool isForwards)
+	{
+		// Launch order: the order EVE-O Preview first saw each client window.
+		List<KeyValuePair<IntPtr, IThumbnailView>> clients = _thumbnailViews
+			.Where((KeyValuePair<IntPtr, IThumbnailView> x) => x.Value.Title == DEFAULT_CLIENT_TITLE)
+			.OrderBy((KeyValuePair<IntPtr, IThumbnailView> x) => _clientFirstSeen.TryGetValue(x.Key, out var seen) ? seen : long.MaxValue)
+			.ToList();
+		if (clients.Count == 0)
+		{
+			return;
+		}
+		if (!isForwards)
+		{
+			clients.Reverse();
+		}
+		int index = clients.FindIndex((KeyValuePair<IntPtr, IThumbnailView> x) => x.Key == _activeClient.Handle);
+		SetActive(clients[(index + 1) % clients.Count]);
 	}
 
 	public IThumbnailView GetClientByTitle(string title)
@@ -292,6 +342,7 @@ internal sealed class ThumbnailManager : IThumbnailManager
 			view.SetTopMost(_configuration.ShowThumbnailsAlwaysOnTop);
 			view.ThumbnailLocation = (IsManageableThumbnail(view) ? _configuration.GetThumbnailLocation(view.Title, _activeClient.Title, view.ThumbnailLocation) : _configuration.LoginThumbnailLocation);
 			_thumbnailViews.Add(view.Id, view);
+			_clientFirstSeen[view.Id] = ++_clientSeenCounter;
 			view.ThumbnailResized = ThumbnailViewResized;
 			view.ThumbnailMoved = ThumbnailViewMoved;
 			view.ThumbnailFocused = ThumbnailViewFocused;
@@ -325,6 +376,7 @@ internal sealed class ThumbnailManager : IThumbnailManager
 		{
 			IThumbnailView view3 = _thumbnailViews[process3.Handle];
 			_thumbnailViews.Remove(view3.Id);
+			_clientFirstSeen.Remove(view3.Id);
 			if (view3.Title != "EVE")
 			{
 				viewsRemoved.Add(view3.Title);

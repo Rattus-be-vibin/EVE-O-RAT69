@@ -55,6 +55,8 @@
     "EVE - Extra B Character 2": 2,
     "EVE - Extra B Character 3": 3
   },
+  "CharSelectCycleForwardHotkeys": [],
+  "CharSelectCycleBackwardHotkeys": [],
   "PerClientActiveClientHighlightColor": {
     "EVE - Main Character 1": "Red",
     "EVE - Scout Character 1": "Cyan"
