@@ -1,0 +1,98 @@
+{
+  "ConfigVersion": 1,
+  "CycleGroup1ForwardHotkeys": [
+    "Tab"
+  ],
+  "CycleGroup1BackwardHotkeys": [
+    "Shift+Tab"
+  ],
+  "CycleGroup1ClientsOrder": {
+    "EVE - Main Character 1": 1,
+    "EVE - Main Character 2": 2,
+    "EVE - Main Character 3": 3
+  },
+  "CycleGroup2ForwardHotkeys": [
+    "Oemtilde"
+  ],
+  "CycleGroup2BackwardHotkeys": [
+    "Shift+Oemtilde"
+  ],
+  "CycleGroup2ClientsOrder": {
+    "EVE - Scout Character 1": 1,
+    "EVE - Scout Character 2": 2,
+    "EVE - Scout Character 3": 3
+  },
+  "CycleGroup3ForwardHotkeys": [
+    "Z"
+  ],
+  "CycleGroup3BackwardHotkeys": [
+    "Shift+Z"
+  ],
+  "CycleGroup3ClientsOrder": {
+    "EVE - Utility Character 1": 1,
+    "EVE - Utility Character 2": 2,
+    "EVE - Utility Character 3": 3
+  },
+  "CycleGroup4ForwardHotkeys": [
+    "F16"
+  ],
+  "CycleGroup4BackwardHotkeys": [
+    "Control+F16"
+  ],
+  "CycleGroup4ClientsOrder": {
+    "EVE - Extra A Character 1": 1,
+    "EVE - Extra A Character 2": 2,
+    "EVE - Extra A Character 3": 3
+  },
+  "CycleGroup5ForwardHotkeys": [
+    "F17"
+  ],
+  "CycleGroup5BackwardHotkeys": [
+    "Control+F17"
+  ],
+  "CycleGroup5ClientsOrder": {
+    "EVE - Extra B Character 1": 1,
+    "EVE - Extra B Character 2": 2,
+    "EVE - Extra B Character 3": 3
+  },
+  "PerClientActiveClientHighlightColor": {
+    "EVE - Main Character 1": "Red",
+    "EVE - Scout Character 1": "Cyan"
+  },
+  "MinimizeToTray": true,
+  "ThumbnailRefreshPeriod": 500,
+  "CompatibilityMode": false,
+  "ThumbnailsOpacity": 1.0,
+  "EnableClientLayoutTracking": false,
+  "HideActiveClientThumbnail": false,
+  "MinimizeInactiveClients": false,
+  "ShowThumbnailsAlwaysOnTop": true,
+  "EnablePerClientThumbnailLayouts": false,
+  "HideThumbnailsOnLostFocus": true,
+  "HideThumbnailsDelay": 2,
+  "HotkeysOnlyWhenClientActive": true,
+  "ThumbnailSize": "290, 140",
+  "ThumbnailMaximumSize": "290, 140",
+  "ThumbnailMinimumSize": "290, 140",
+  "EnableThumbnailSnap": true,
+  "EnableThumbnailZoom": false,
+  "ThumbnailZoomFactor": 2,
+  "ThumbnailZoomAnchor": 1,
+  "ShowThumbnailOverlays": true,
+  "ShowThumbnailFrames": false,
+  "EnableActiveClientHighlight": true,
+  "ActiveClientHighlightColor": "Lime",
+  "ActiveClientHighlightThickness": 3,
+  "LoginThumbnailLocation": "5, 5",
+  "PerClientLayout": {},
+  "FlatLayout": {},
+  "ClientLayout": {},
+  "ClientHotkey": {
+    "EVE - Main Character 1": "Shift+F1"
+  },
+  "DisableThumbnail": {
+    "EVE - Main Character 2": true,
+    "EVE - Main Character 3": true
+  },
+  "PriorityClients": []
+}

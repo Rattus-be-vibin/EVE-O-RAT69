@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: ['src/**', 'lib/**', '.github/workflows/build.yml']
+    paths: ['src/**', 'lib/**', 'template/**', '.github/workflows/build.yml']
 permissions:
   contents: write
 concurrency: build
@@ -22,12 +22,15 @@ jobs:
           msbuild "src/EVE-O Preview.csproj" -restore -p:Configuration=Release -v:minimal -nologo 2>&1 | Tee-Object ci/build.log
           if ($LASTEXITCODE -ne 0) { "BUILD FAILED" | Add-Content ci/build.log; exit 1 }
           Copy-Item "src/bin/Release/net48/EVE-O Preview.exe" "build/EVE-O Preview.exe" -Force
+          New-Item -ItemType Directory -Force pkg | Out-Null
+          Copy-Item "build/EVE-O Preview.exe", "template/EVE-O Preview.json", "template/README.md" pkg/
+          Compress-Archive -Path pkg/* -DestinationPath "build/EVE-O-Preview-share.zip" -Force
           "BUILD OK $(Get-Date -Format o)" | Add-Content ci/build.log
       - uses: actions/upload-artifact@v4
         if: steps.build.outcome == 'success'
         with:
           name: EVE-O-Preview
-          path: build/EVE-O Preview.exe
+          path: build/*
       - name: Commit build output
         if: always()
         shell: pwsh
