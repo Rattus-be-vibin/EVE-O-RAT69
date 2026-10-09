@@ -119,9 +119,27 @@ internal sealed class ThumbnailManager : IThumbnailManager
 	}
 
 	// --- Cycle through clients sitting at character select (window title is exactly "EVE") ---
+	// Process start time per client window, used to cycle in launch order.
 	private readonly Dictionary<IntPtr, long> _clientFirstSeen = new Dictionary<IntPtr, long>();
 
-	private long _clientSeenCounter;
+	private static long GetProcessStartTicks(IntPtr windowHandle)
+	{
+		try
+		{
+			GetWindowThreadProcessId(windowHandle, out var processId);
+			if (processId != 0)
+			{
+				using (Process process = Process.GetProcessById((int)processId))
+				{
+					return process.StartTime.ToUniversalTime().Ticks;
+				}
+			}
+		}
+		catch
+		{
+		}
+		return long.MaxValue;
+	}
 
 	private void RegisterCharSelectCycleHotkey(List<string> hotkeys, bool isForwards)
 	{
@@ -147,12 +165,23 @@ internal sealed class ThumbnailManager : IThumbnailManager
 		}
 	}
 
+	private long GetLaunchOrderKey(IntPtr windowHandle)
+	{
+		if (!_clientFirstSeen.TryGetValue(windowHandle, out var ticks) || ticks == long.MaxValue)
+		{
+			ticks = GetProcessStartTicks(windowHandle);
+			_clientFirstSeen[windowHandle] = ticks;
+		}
+		return ticks;
+	}
+
 	public void CycleCharSelectClient(bool isForwards)
 	{
-		// Launch order: the order EVE-O Preview first saw each client window.
+		// Launch order: when each EVE client process was started.
 		List<KeyValuePair<IntPtr, IThumbnailView>> clients = _thumbnailViews
 			.Where((KeyValuePair<IntPtr, IThumbnailView> x) => x.Value.Title == DEFAULT_CLIENT_TITLE)
-			.OrderBy((KeyValuePair<IntPtr, IThumbnailView> x) => _clientFirstSeen.TryGetValue(x.Key, out var seen) ? seen : long.MaxValue)
+			.OrderBy((KeyValuePair<IntPtr, IThumbnailView> x) => GetLaunchOrderKey(x.Key))
+			.ThenBy((KeyValuePair<IntPtr, IThumbnailView> x) => x.Key.ToInt64())
 			.ToList();
 		if (clients.Count == 0)
 		{
@@ -342,7 +371,7 @@ internal sealed class ThumbnailManager : IThumbnailManager
 			view.SetTopMost(_configuration.ShowThumbnailsAlwaysOnTop);
 			view.ThumbnailLocation = (IsManageableThumbnail(view) ? _configuration.GetThumbnailLocation(view.Title, _activeClient.Title, view.ThumbnailLocation) : _configuration.LoginThumbnailLocation);
 			_thumbnailViews.Add(view.Id, view);
-			_clientFirstSeen[view.Id] = ++_clientSeenCounter;
+			_clientFirstSeen[view.Id] = GetProcessStartTicks(view.Id);
 			view.ThumbnailResized = ThumbnailViewResized;
 			view.ThumbnailMoved = ThumbnailViewMoved;
 			view.ThumbnailFocused = ThumbnailViewFocused;
