@@ -30,6 +30,11 @@ internal class ConfigurationStorage : IConfigurationStorage
 			JsonConvert.PopulateObject(value, _thumbnailConfiguration, settings);
 			_thumbnailConfiguration.ApplyRestrictions();
 		}
+		else
+		{
+			// First launch: write the default configuration so it can be edited.
+			Save();
+		}
 	}
 
 	public void Save()
