@@ -4,8 +4,11 @@ A modified build of EVE-O Preview 6.0.0.3 (Rattus Edition v1.1), decompiled and 
 
 ## Download
 
-- **[EVE-O-Preview-share.zip](build/EVE-O-Preview-share.zip)**: the exe, a template config with placeholder character names, and a setup guide.
-- **[EVE-O Preview.exe](build/EVE-O%20Preview.exe)**: the exe on its own.
+Get the latest version from the **[Releases page](../../releases/latest)** and download
+`EVE-O-Preview-share.zip`. It contains the exe, a template config with placeholder character
+names, and a setup guide.
+
+The newest build is also always in the [`build`](build/) folder.
 
 Setup instructions: [template/README.md](template/README.md)
 
@@ -15,6 +18,10 @@ Setup instructions: [template/README.md](template/README.md)
 - **Character-select cycling.** `CharSelectCycleForwardHotkeys` / `CharSelectCycleBackwardHotkeys` cycle through clients at character select (window title `EVE`), in launch order. Off by default.
 - **Default config written on first launch** if no `EVE-O Preview.json` exists.
 - **Fixed default hotkey:** group 1 backward was Ctrl+Enter, now Ctrl+F13.
+
+## Contact
+
+For suggestions, contact **#therattus** on Discord.
 
 ## Repository layout
 
